@@ -352,7 +352,7 @@
       "files": [],
       "dependencies": ["T25", "T29", "T34", "T35"],
       "external_prerequisites": ["本机已配置目标 GitHub 仓库写权限"],
-      "status": "pending",
+      "status": "completed",
       "acceptance": ["提交前秘密扫描无发现", "模型、数据集、.env、日志和缓存未进入提交", "远程默认分支包含可复现代码和文档"],
       "interfaces": [],
       "coder_notes": "远程仓库当前无 HEAD；未经测试通过不得推送。"
