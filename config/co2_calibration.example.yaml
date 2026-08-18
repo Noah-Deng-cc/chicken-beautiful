@@ -1,0 +1,13 @@
+# MH-Z19 暂定 UART 适配器配置；真实传感器型号确认后再启用。
+connection:
+  port: "/dev/serial0"
+  baud_rate: 9600
+  timeout_seconds: 1.0
+  retries: 3
+
+# 阈值由室内通风策略决定，单位 ppm。
+thresholds_ppm:
+  elevated: 1000
+  poor: 1500
+
+# MH-Z19 输出已校准的 ppm；不在此文件中编造补偿或基线参数。

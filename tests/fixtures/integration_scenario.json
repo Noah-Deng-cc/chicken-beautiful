@@ -1,0 +1,9 @@
+{
+  "name": "mock-end-to-end-dorm-scenario",
+  "vision": {"emotion": "neutral", "confidence": 0.9},
+  "thermal": {"maximum_celsius": 38.2, "average_celsius": 36.8},
+  "co2": {"ppm": 1800, "level": "poor"},
+  "reminder": {"id": "ventilate", "message": "开窗通风"},
+  "dialogue": {"transcript": "现在需要做什么？", "reply": "请先开窗通风。"},
+  "faults": ["vision", "thermal", "co2", "network", "audio"]
+}

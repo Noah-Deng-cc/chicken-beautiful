@@ -1,0 +1,20 @@
+# 树莓派运行（开发机模拟模式亦复用，ONNX 推理由 OpenCV DNN 执行）
+PyYAML>=6.0.1,<7
+requests>=2.31,<3
+numpy>=1.24,<3
+opencv-python-headless>=4.8,<5
+vosk>=0.3.45,<0.4
+sounddevice>=0.4.6,<1
+pyserial>=3.5,<4
+
+# 开发机训练与导出（ARM 上跳过，避免树莓派安装 PyTorch/CUDA 训练栈）
+ultralytics>=8.3,<9; platform_machine != "aarch64" and platform_machine != "armv7l"
+
+# 自动化测试
+pytest>=8.0,<9
+pytest-cov>=5,<7
+
+# 真实硬件驱动为可选依赖，确认传感器型号后在树莓派单独安装：
+# MLX90640 可使用 adafruit-circuitpython-mlx90640；系统需先启用 I2C。
+# MH-Z19 当前通过 pyserial 实现，不需要额外厂商包；系统需先启用 UART。
+# 树莓派上的 OpenCV、PortAudio 或 espeak-ng 也可能需要由 apt 提供系统库。

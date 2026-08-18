@@ -1,0 +1,14 @@
+# 七类人脸情绪检测数据；路径相对本文件，数据集不随仓库分发。
+path: ../data/datasets/emotions
+train: images/train
+val: images/val
+test: images/test
+nc: 7
+names:
+  0: angry
+  1: disgusted
+  2: fearful
+  3: happy
+  4: neutral
+  5: sad
+  6: surprised

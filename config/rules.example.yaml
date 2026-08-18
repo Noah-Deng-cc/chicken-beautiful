@@ -1,0 +1,10 @@
+# 本地融合与安全规则；复制为 rules.yaml 后按部署场景校准。
+freshness:
+  stale_after_seconds: 60.0
+
+alerts:
+  high_temperature_celsius: 38.0
+  high_co2_ppm: 1500
+  required_temperature_quality: "good"
+
+# 情绪识别仅用于观察上下文，不能作为医学诊断或紧急医疗判断。

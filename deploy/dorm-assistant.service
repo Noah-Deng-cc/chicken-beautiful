@@ -1,0 +1,25 @@
+[Unit]
+Description=Dormitory Edge Assistant
+Wants=network-online.target
+After=network-online.target sound.target
+
+[Service]
+Type=simple
+User=dormassistant
+Group=dormassistant
+WorkingDirectory=/opt/dorm-assistant
+EnvironmentFile=/etc/dorm-assistant/dorm-assistant.env
+ExecStart=/opt/dorm-assistant/.venv/bin/python /opt/dorm-assistant/main.py run --config /opt/dorm-assistant/config/settings.pi.yaml
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+MemoryMax=400M
+OOMScoreAdjust=-500
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=full
+ReadWritePaths=/opt/dorm-assistant /var/lib/dorm-assistant
+
+[Install]
+WantedBy=multi-user.target

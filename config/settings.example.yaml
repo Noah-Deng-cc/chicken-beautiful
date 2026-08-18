@@ -1,0 +1,106 @@
+# 所有路径均相对项目根目录；复制为 settings.yaml 后按本机环境修改。
+runtime:
+  mode: "mock"  # mock | development | pi
+  timezone: "Asia/Shanghai"
+  shutdown_timeout_seconds: 10.0
+
+vision:
+  enabled: true
+  driver: "mock"  # mock | yolo
+  model_path: "data/models/emotion.onnx"
+  model_format: "onnx"  # onnx | ncnn
+  device: "cpu"
+  confidence_threshold: 0.50
+  sample_interval_seconds: 0.20
+  camera:
+    source: 0
+    backend: "opencv"  # opencv | libcamera
+    width: 640
+    height: 480
+    fps: 15
+  mock:
+    emotion: "neutral"
+    confidence: 0.90
+
+thermal:
+  enabled: false
+  driver: "mock"  # mock | mlx90640
+  sample_interval_seconds: 2.0
+  min_valid_celsius: 20.0
+  max_valid_celsius: 45.0
+  calibration:
+    emissivity: 0.95
+    offset_celsius: 0.0
+  connection:
+    bus: 1
+    address: "0x33"
+    retries: 3
+  mock:
+    maximum_celsius: 36.7
+    average_celsius: 35.8
+
+co2:
+  enabled: false
+  driver: "mock"  # mock | mhz19
+  sample_interval_seconds: 5.0
+  thresholds_ppm:
+    elevated: 1000
+    poor: 1500
+  connection:
+    port: "<serial-port>"
+    baud_rate: 9600
+    timeout_seconds: 1.0
+    retries: 3
+  mock:
+    ppm: 650
+
+audio:
+  enabled: false
+  input_driver: "mock"  # mock | vosk
+  output_driver: "mock"  # mock | system_tts
+  language: "zh-CN"
+  listen_timeout_seconds: 8.0
+  input:
+    device: null
+    sample_rate_hz: 16000
+    vosk_model_path: "data/models/vosk-cn"
+  output:
+    device: null
+    command_argv: ["espeak-ng", "-v", "cmn", "{text}"]
+    timeout_seconds: 20.0
+
+agent:
+  enabled: false
+  driver: "mock"  # mock | tongji
+  base_url: "https://example.invalid/api"
+  endpoint: "/agent-call"
+  api_key_env: "DORM_ASSISTANT_AGENT_API_KEY"
+  agent_id_env: "DORM_ASSISTANT_AGENT_ID"
+  connect_timeout_seconds: 5.0
+  read_timeout_seconds: 30.0
+  max_retries: 3
+  backoff_seconds: 1.0
+  stream: false
+
+schedule:
+  enabled: true
+  store_path: "data/schedule/reminders.json"
+  poll_interval_seconds: 1.0
+  default_timezone: "Asia/Shanghai"
+
+storage:
+  directory: "data/runtime"
+  jsonl_enabled: true
+  rotate_daily: true
+  persist_dialogue_text: false
+  persist_raw_audio: false
+  persist_raw_images: false
+
+logging:
+  level: "INFO"
+  console_enabled: true
+  file_enabled: true
+  directory: "logs"
+  filename: "dorm-assistant.log"
+  max_bytes: 5242880
+  backup_count: 3

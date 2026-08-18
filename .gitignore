@@ -1,0 +1,97 @@
+# 本机配置与秘密
+request.md
+.env
+.env.*
+!.env.example
+.envrc
+config/settings.yaml
+config/settings.*.yaml
+!config/settings.example.yaml
+!config/settings.*.example.yaml
+*.pem
+*.key
+*.p12
+*.secret
+*.token
+credentials*.json
+secrets/
+keys/
+
+# Python 虚拟环境、缓存与构建产物
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+build/
+dist/
+*.egg-info/
+
+# 编辑器与操作系统文件
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 模型权重与推理引擎（仅提交模型卡、指标和校验和）
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.weights
+*.pb
+*.ncnn.bin
+*.ncnn.param
+*.engine
+*.tflite
+*.torchscript
+data/models/*
+!data/models/.gitkeep
+!data/models/README.md
+
+# 训练数据集、运行数据和隐私数据
+datasets/
+data/datasets/
+data/train/
+data/val/
+data/test/
+training/datasets/
+data/persons/
+data/sessions/
+data/raw/
+raw_data/
+data/runtime/
+data/schedule/
+data/audio/
+data/images/
+
+# 日志、临时文件和进程状态
+logs/
+*.log
+*.log.*
+*.pid
+*.tmp
+*.swp
+
+# 测试生成物；允许用说明文件或占位文件保留报告目录结构
+tests/reports/*
+!tests/reports/.gitkeep
+!tests/reports/README.md
+tests/.generated/
+test-results/
+
+# 本地训练运行目录
+runs/
+wandb/
+mlruns/
+
+# 可提交的项目验证摘要（即使将来增加 docs/* 忽略规则也保留）
+!docs/project-log.md

@@ -1,0 +1,7 @@
+# 工厂支持的显式实现白名单；运行时不读取任意模块名。
+vision: [mock, yolo]
+thermal: [mock, mlx90640]
+co2: [mock, mhz19]
+audio_input: [mock, vosk]
+audio_output: [mock, system_tts]
+agent: [mock, tongji]

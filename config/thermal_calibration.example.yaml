@@ -1,0 +1,12 @@
+# MLX90640 体表温度观察校准示例；需按已确认传感器和环境实测调整。
+thermal:
+  driver: "mlx90640"
+  connection:
+    bus: 1
+    address: "0x33"
+    retries: 3
+  calibration:
+    emissivity: 0.95
+    offset_celsius: 0.0
+  min_valid_celsius: 20.0
+  max_valid_celsius: 45.0
