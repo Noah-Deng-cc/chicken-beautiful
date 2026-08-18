@@ -88,7 +88,7 @@ def test_real_yolo_construction_is_lazy_and_does_not_open_camera(tmp_path: Path)
     [
         ("vision", "driver", "vision", "mock, yolo"),
         ("audio", "input_driver", "audio input", "mock, vosk"),
-        ("agent", "driver", "agent", "mock, tongji"),
+        ("agent", "driver", "agent", "mock, tongji, tongji_mcp"),
     ],
 )
 def test_unknown_drivers_are_rejected_with_whitelist(
@@ -142,7 +142,7 @@ def test_registry_is_parseable_explicit_and_matches_factory_whitelists() -> None
         "vision": ["mock", "yolo"], "thermal": ["mock", "mlx90640"],
         "co2": ["mock", "mhz19"],
         "audio_input": ["mock", "vosk"], "audio_output": ["mock", "system_tts"],
-        "agent": ["mock", "tongji"],
+        "agent": ["mock", "tongji", "tongji_mcp"],
     }
     assert all(all(isinstance(item, str) and "." not in item for item in values)
                for values in registry.values())

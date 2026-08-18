@@ -1,0 +1,5 @@
+{
+  "url": "https://agent.tongji.edu.cn/api/proxy/mcp",
+  "api_key_env": "TONGJI_MCP_API_KEY",
+  "tool_manifest": "config/mcp.tools.json"
+}

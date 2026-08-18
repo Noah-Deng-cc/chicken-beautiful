@@ -1,0 +1,40 @@
+{
+  "tools": [
+    {
+      "name": "chicken-beauty",
+      "description": "多功能桌面机器人内置智能体，完成基于情绪识别结果的聊天功能，具有共情、善解人意的能力",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "Files": {
+            "description": "List of pictures, videos and other files",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Name": {
+                  "description": "Image, video and other file name",
+                  "type": "string"
+                },
+                "Type": {
+                  "description": "File type",
+                  "enum": ["text", "image", "video", "file"],
+                  "type": "string"
+                },
+                "Url": {
+                  "description": "Image, video and other file url",
+                  "type": "string"
+                }
+              },
+              "required": ["Name", "Url", "Type"]
+            }
+          },
+          "Query": {
+            "description": "User's questions",
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}

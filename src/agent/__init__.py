@@ -4,6 +4,7 @@ from .base import (AgentClient, AgentConfigurationError, AgentError,
                    AgentResponseError, AgentTransportError, HttpResponse, HttpTransport,
                    RequestsTransport)
 from .tongji import TongjiAgentClient, TongjiContract
+from .mcp import TongjiMcpAgentClient
 
 __all__ = [
     "AgentClient",
@@ -16,4 +17,5 @@ __all__ = [
     "RequestsTransport",
     "TongjiAgentClient",
     "TongjiContract",
+    "TongjiMcpAgentClient",
 ]

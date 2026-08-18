@@ -71,7 +71,7 @@ audio:
 
 agent:
   enabled: false
-  driver: "mock"  # mock | tongji
+  driver: "mock"  # mock | tongji | tongji_mcp
   base_url: "https://example.invalid/api"
   endpoint: "/agent-call"
   api_key_env: "DORM_ASSISTANT_AGENT_API_KEY"

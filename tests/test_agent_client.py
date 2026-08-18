@@ -26,6 +26,7 @@ from src.agent import (
     RequestsTransport,
     TongjiAgentClient,
     TongjiContract,
+    TongjiMcpAgentClient,
 )
 from src.core import AgentSettings
 
@@ -129,6 +130,7 @@ def test_public_exports_and_default_request_response_mapping() -> None:
         "RequestsTransport",
         "TongjiAgentClient",
         "TongjiContract",
+        "TongjiMcpAgentClient",
     }
     assert set(agent.__all__) == expected_exports
     transport = FakeTransport([success("  你好，世界  ", "next-session")])

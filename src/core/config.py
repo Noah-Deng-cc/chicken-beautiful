@@ -142,7 +142,8 @@ def _agent(root: Mapping[str, object]) -> AgentSettings:
     api_key, agent_id = os.environ.get(api_env), os.environ.get(agent_env)
     enabled = cast(bool, _typed(root, "agent.enabled", bool))
     driver = cast(str, _typed(root, "agent.driver", str))
-    if enabled and driver != "mock" and (not api_key or not agent_id):
+    requires_id = driver not in ("mock", "tongji_mcp")
+    if enabled and driver != "mock" and (not api_key or (requires_id and not agent_id)):
         missing = "agent.api_key" if not api_key else "agent.agent_id"
         raise ConfigError(f"missing required configuration field '{missing}' (environment variable)")
     base_url = cast(str, _typed(root, "agent.base_url", str))

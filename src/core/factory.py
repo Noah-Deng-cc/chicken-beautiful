@@ -187,9 +187,12 @@ class ComponentFactory:
         driver = ComponentFactory._driver(settings, settings.agent, "driver")
         if driver == "mock":
             return _MockAgent()
-        if driver != "tongji":
-            raise ComponentFactory._unknown("agent", driver, ("mock", "tongji"))
+        if driver not in ("tongji", "tongji_mcp"):
+            raise ComponentFactory._unknown("agent", driver, ("mock", "tongji", "tongji_mcp"))
         try:
+            if driver == "tongji_mcp":
+                from src.agent import TongjiMcpAgentClient
+                return TongjiMcpAgentClient(settings.agent)
             from src.agent import TongjiAgentClient
             return TongjiAgentClient(settings.agent)
         except Exception as exc:
