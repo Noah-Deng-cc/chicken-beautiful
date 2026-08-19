@@ -33,6 +33,14 @@
 - 未发现热成像和 CO2 传感器节点，I2C/GPIO 仅完成系统级可见性检查。
 - 下一步：补充 logits softmax 与模型标签映射测试；由管理员安装 `pytest`/音频依赖；接入并校准实际传感器后执行 `self-test` 和稳定性测试。
 
+### 完整链路验收（2026-08-19）
+
+- 已在树莓派真实执行：`picamera2` 采集帧 -> OpenCV DNN 加载 `emotion.onnx` -> logits softmax -> `EmotionReading`。
+- 已将七类 logits 的稳定 softmax 后处理加入 `src/vision/yolo.py`，新增回归测试；本地全量测试结果为 `809 passed`。
+- 实测单帧识别：`surprised`，置信度约 `0.368`。
+- 已将识别结果和非敏感测试语音文本传入同济 `chicken-beauty` MCP Agent；Agent 成功返回中文文本并建立 MCP session。
+- 当前完整链路已验证到“返回文本”；树莓派未检测到音频设备，因此尚未验证最后的 TTS 播放环节。
+
 ## 自动化验证摘要
 
 - 全量自动化快照：`800 passed`（本次记录为 `799 passed + 1 xfail`；审计测试去除该 xfail 后折算为 800）。该数字仅代表此快照运行结果。
