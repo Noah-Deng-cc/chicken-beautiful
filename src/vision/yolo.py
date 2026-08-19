@@ -20,6 +20,19 @@ _VA = {Emotion.ANGRY: (-0.7, 0.8), Emotion.DISGUSTED: (-0.6, 0.4),
        Emotion.FEARFUL: (-0.8, 0.8), Emotion.HAPPY: (0.8, 0.6),
        Emotion.NEUTRAL: (0.0, 0.0), Emotion.SAD: (-0.7, -0.4),
        Emotion.SURPRISED: (0.2, 0.8)}
+
+
+def _softmax(values: Sequence[object]) -> list[float] | None:
+    """将七类分类 logits 稳定转换为概率。"""
+    if len(values) != 7 or not all(isinstance(item, (int, float)) and not isinstance(item, bool)
+                                   and isfinite(float(item)) for item in values):
+        return None
+    scores = [float(item) for item in values]
+    peak = max(scores)
+    import math
+    exponentials = [math.exp(score - peak) for score in scores]
+    total = sum(exponentials)
+    return [value / total for value in exponentials] if total > 0 else None
 class InferenceBackend(Protocol):
     """可替换的轻量推理后端契约。"""
     def load(self, model_path: Path, input_size: int) -> None:
@@ -68,7 +81,7 @@ def parse_emotion_output(raw: object, threshold: float) -> tuple[Emotion, float]
             value = value.tolist() if hasattr(value, "tolist") else value
         if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or not value:
             return None
-        if all(isinstance(item, (int, float)) for item in value):
+        if all(isinstance(item, (int, float)) and not isinstance(item, bool) for item in value):
             rows = [value]
         elif all(isinstance(item, Sequence) for item in value):
             rows = list(value)
@@ -78,6 +91,14 @@ def parse_emotion_output(raw: object, threshold: float) -> tuple[Emotion, float]
             return None
         best: tuple[Emotion, float] | None = None
         for row in rows:
+            # Classification ONNX exports commonly return raw logits in [1, 7].
+            # Values outside [0, 1] are unambiguously logits; normalize them before parsing.
+            if len(row) == 7 and any(isinstance(item, (int, float)) and not 0.0 <= float(item) <= 1.0
+                                     for item in row):
+                probabilities = _softmax(row)
+                if probabilities is None:
+                    continue
+                row = probabilities
             candidate = _parse_row(row)
             if candidate and candidate[1] >= threshold and (best is None or candidate[1] > best[1]):
                 best = candidate

@@ -106,6 +106,13 @@ def test_seven_column_classification_maps_every_emotion(index: int) -> None:
     assert parse_emotion_output(classification(index), 0.5) == (LABELS[index], 0.9)
 
 
+def test_seven_column_logits_are_softmax_normalized() -> None:
+    """Raw seven-class ONNX logits become a valid confidence and label."""
+    assert parse_emotion_output([-1.0, -2.0, 0.1, -0.5, 0.4, -0.2, 1.2], 0.4) == (
+        Emotion.SURPRISED, pytest.approx(0.4232, rel=1e-3)
+    )
+
+
 def test_eleven_and_twelve_column_detection_outputs() -> None:
     """YOLO rows with and without objectness produce the correct confidence."""
     row11 = [1.0, 2.0, 3.0, 4.0, *classification(5, 0.8)]
