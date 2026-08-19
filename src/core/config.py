@@ -15,7 +15,7 @@ from . import AgentSettings, ConfigError, LoggingSettings, SectionSettings, Sett
 
 _REQUIRED: Mapping[str, tuple[str, ...]] = {
     "runtime": ("mode", "timezone", "shutdown_timeout_seconds"),
-    "vision": ("enabled", "driver", "model_path", "model_format", "device", "confidence_threshold", "sample_interval_seconds", "camera.source", "camera.backend", "camera.width", "camera.height", "camera.fps", "mock.emotion", "mock.confidence"),
+    "vision": ("enabled", "driver", "model_path", "model_format", "device", "confidence_threshold", "sample_interval_seconds", "camera.source", "camera.backend", "camera.width", "camera.height", "camera.fps", "face_detection.enabled", "face_detection.cascade_path", "face_detection.scale_factor", "face_detection.min_neighbors", "face_detection.min_width", "face_detection.min_height", "mock.emotion", "mock.confidence"),
     "thermal": ("enabled", "driver", "sample_interval_seconds", "min_valid_celsius", "max_valid_celsius", "calibration.emissivity", "calibration.offset_celsius", "connection.bus", "connection.address", "connection.retries", "mock.maximum_celsius", "mock.average_celsius"),
     "co2": ("enabled", "driver", "sample_interval_seconds", "thresholds_ppm.elevated", "thresholds_ppm.poor", "connection.port", "connection.baud_rate", "connection.timeout_seconds", "connection.retries", "mock.ppm"),
     "audio": ("enabled", "input_driver", "output_driver", "language", "listen_timeout_seconds", "input.device", "input.sample_rate_hz", "input.vosk_model_path", "output.device", "output.command_argv", "output.timeout_seconds"),
@@ -24,7 +24,7 @@ _REQUIRED: Mapping[str, tuple[str, ...]] = {
     "storage": ("directory", "jsonl_enabled", "rotate_daily", "persist_dialogue_text", "persist_raw_audio", "persist_raw_images"),
     "logging": ("level", "console_enabled", "file_enabled", "directory", "filename", "max_bytes", "backup_count"),
 }
-_PATH_FIELDS = ("vision.model_path", "audio.input.vosk_model_path", "schedule.store_path", "storage.directory", "logging.directory")
+_PATH_FIELDS = ("vision.model_path", "vision.face_detection.cascade_path", "audio.input.vosk_model_path", "schedule.store_path", "storage.directory", "logging.directory")
 
 
 def _mapping(value: object, path: str) -> dict[str, object]:

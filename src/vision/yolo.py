@@ -38,6 +38,51 @@ class InferenceBackend(Protocol):
     def load(self, model_path: Path, input_size: int) -> None:
         """加载模型。\n\n        Args: model_path: 模型路径。input_size: 方形输入边长。\n        Returns: 无。\n        Raises: RuntimeError: 模型不可用。"""
         ...
+
+
+class FaceDetector(Protocol):
+    """可选的人脸裁剪器契约。"""
+
+    def detect(self, frame: object) -> object | None:
+        """返回最大人脸区域，未检测到人脸时返回 None。"""
+        ...
+
+
+class HaarFaceDetector:
+    """使用 OpenCV Haar cascade 在树莓派 CPU 上检测最大人脸。"""
+
+    def __init__(self, cascade_path: Path, *, scale_factor: float = 1.1,
+                 min_neighbors: int = 5, min_size: tuple[int, int] = (64, 64)) -> None:
+        if not isinstance(cascade_path, Path):
+            raise TypeError("cascade_path must be a Path")
+        if scale_factor <= 1.0 or min_neighbors < 1 or any(size < 1 for size in min_size):
+            raise ValueError("invalid face detector configuration")
+        self._path = cascade_path
+        self._scale_factor, self._min_neighbors, self._min_size = scale_factor, min_neighbors, min_size
+        self._cv2: object | None = None
+        self._cascade: object | None = None
+
+    def detect(self, frame: object) -> object | None:
+        if self._cv2 is None or self._cascade is None:
+            if not self._path.is_file():
+                raise FileNotFoundError(f"face cascade not found: {self._path}")
+            self._cv2 = importlib.import_module("cv2")
+            cascade = self._cv2.CascadeClassifier(str(self._path))  # type: ignore[union-attr]
+            if cascade.empty():
+                raise RuntimeError("face cascade could not be loaded")
+            self._cascade = cascade
+        gray = self._cv2.cvtColor(frame, self._cv2.COLOR_BGR2GRAY)  # type: ignore[union-attr]
+        faces = self._cascade.detectMultiScale(  # type: ignore[union-attr]
+            gray, scaleFactor=self._scale_factor, minNeighbors=self._min_neighbors,
+            minSize=self._min_size)
+        if len(faces) == 0:
+            return None
+        x, y, width, height = max(faces, key=lambda item: int(item[2]) * int(item[3]))
+        return frame[int(y):int(y + height), int(x):int(x + width)]
+
+    def close(self) -> None:
+        self._cascade = None
+        self._cv2 = None
     def infer(self, frame: object) -> object:
         """执行一次推理。\n\n        Args: frame: 后端原生帧。\n        Returns: 原始模型输出。\n        Raises: RuntimeError: 推理失败。"""
         ...
@@ -133,7 +178,7 @@ class YoloEmotionPipeline(VisionPipeline):
     def __init__(self, source: CameraSource, model_path: Path, *,
                  backend: str | InferenceBackend = "onnx", confidence_threshold: float = 0.5,
                  input_size: int = 320, device: str = "cpu", sample_interval_seconds: float = 0.2,
-                 logger: logging.Logger | None = None) -> None:
+                 logger: logging.Logger | None = None, face_detector: FaceDetector | None = None) -> None:
         """保存推理配置且不加载模型。\n\n        Args: source: 可注入帧源。model_path: 导出模型路径。backend: onnx、ncnn 或后端对象。confidence_threshold: 最低置信度。input_size: 输入边长，最大 320。device: 设备端固定为 cpu。sample_interval_seconds: 最短采样间隔。logger: 可选日志器。\n        Returns: 无。\n        Raises: TypeError: 参数类型错误。ValueError: 数值、设备或后端名称非法。"""
         if not isinstance(model_path, Path):
             raise TypeError("model_path must be a Path")
@@ -152,6 +197,9 @@ class YoloEmotionPipeline(VisionPipeline):
         if not isinstance(backend, str) and not all(callable(getattr(backend, name, None)) for name in ("load", "infer", "close")):
             raise TypeError("injected backend must implement load, infer, and close")
         self._source, self._model_path, self._backend_spec = source, model_path, backend
+        if face_detector is not None and not callable(getattr(face_detector, "detect", None)):
+            raise TypeError("face_detector must implement detect")
+        self._face_detector = face_detector
         self._threshold, self._input_size = float(confidence_threshold), input_size
         self._interval, self._logger = float(sample_interval_seconds), logger or logging.getLogger(__name__)
         self._backend: InferenceBackend | None = None
@@ -181,6 +229,10 @@ class YoloEmotionPipeline(VisionPipeline):
                 frame = self._source.read()
                 if frame is None:
                     return None
+                if self._face_detector is not None:
+                    frame = self._face_detector.detect(frame)
+                    if frame is None:
+                        return None
                 backend = self._ensure_backend()
                 detected = parse_emotion_output(backend.infer(frame), self._threshold)
                 if detected is None:
@@ -198,7 +250,7 @@ class YoloEmotionPipeline(VisionPipeline):
             if self._closed:
                 return
             self._closed, self._started = True, False
-            for resource in (self._backend, self._source):
+            for resource in (self._backend, self._face_detector, self._source):
                 try:
                     if resource is not None:
                         resource.close()

@@ -41,6 +41,13 @@
 - 已将识别结果和非敏感测试语音文本传入同济 `chicken-beauty` MCP Agent；Agent 成功返回中文文本并建立 MCP session。
 - 当前完整链路已验证到“返回文本”；树莓派未检测到音频设备，因此尚未验证最后的 TTS 播放环节。
 
+### 人脸检测增强（2026-08-19）
+
+- 新增 OpenCV Haar cascade 人脸检测器；启用后先裁剪最大人脸，再执行七类情绪分类，避免直接对整帧背景分类。
+- cascade 文件纳入 `data/vision/haarcascade_frontalface_default.xml`；树莓派 OpenCV 不带内置 cascade，因此使用项目资源文件。
+- 树莓派样例验证检测到 `169x169` 人脸区域，并输出 `neutral`（约 `0.889`）；真实摄像头无脸时管道返回空结果，不产生误分类。
+- 配置入口为 `vision.face_detection`，CSI 摄像头使用 `picamera2`；人脸检测默认开启于示例配置。
+
 ## 自动化验证摘要
 
 - 全量自动化快照：`800 passed`（本次记录为 `799 passed + 1 xfail`；审计测试去除该 xfail 后折算为 800）。该数字仅代表此快照运行结果。

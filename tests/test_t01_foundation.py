@@ -119,6 +119,7 @@ def test_boundary_all_configured_filesystem_paths_are_relative() -> None:
             assert not PureWindowsPath(value).is_absolute(), f"absolute Windows path at {key}: {value}"
     assert checked == [
         "vision.model_path",
+        "vision.face_detection.cascade_path",
         "audio.input.vosk_model_path",
         "schedule.store_path",
         "storage.directory",

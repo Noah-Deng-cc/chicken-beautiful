@@ -90,13 +90,19 @@ class ComponentFactory:
             raise ComponentFactory._unknown("vision", driver, ("mock", "yolo"))
         try:
             from src.vision.camera import CameraSource
-            from src.vision.yolo import YoloEmotionPipeline
+            from src.vision.yolo import HaarFaceDetector, YoloEmotionPipeline
 
             camera = settings.vision.camera
+            face = settings.vision.face_detection
+            detector = HaarFaceDetector(face.cascade_path, scale_factor=float(face.scale_factor),
+                                        min_neighbors=int(face.min_neighbors),
+                                        min_size=(int(face.min_width), int(face.min_height))) \
+                if face.enabled else None
             return YoloEmotionPipeline(CameraSource(camera.source, backend=camera.backend,
                 width=camera.width, height=camera.height, fps=camera.fps), settings.vision.model_path,
                 backend=settings.vision.model_format, confidence_threshold=settings.vision.confidence_threshold,
-                sample_interval_seconds=settings.vision.sample_interval_seconds, device=settings.vision.device)
+                sample_interval_seconds=settings.vision.sample_interval_seconds, device=settings.vision.device,
+                face_detector=detector)
         except Exception as exc:
             raise ComponentFactoryError("vision component could not be created") from exc
 

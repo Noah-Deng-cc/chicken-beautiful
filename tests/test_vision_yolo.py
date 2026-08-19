@@ -93,6 +93,20 @@ class FakeBackend:
             raise self.close_error
 
 
+class FakeFaceDetector:
+    def __init__(self, result: object | None) -> None:
+        self.result = result
+        self.frames: list[object] = []
+        self.close_calls = 0
+
+    def detect(self, frame: object) -> object | None:
+        self.frames.append(frame)
+        return self.result
+
+    def close(self) -> None:
+        self.close_calls += 1
+
+
 def classification(index: int, score: float = 0.9) -> list[float]:
     """Build one seven-class classification row."""
     values = [0.01] * 7
@@ -209,6 +223,22 @@ def test_default_maximum_and_minimum_sizes_reach_injected_backend(input_size: in
     assert result.dominant is Emotion.HAPPY
     assert backend.load_calls == [(Path("model.onnx"), input_size)]
     assert backend.infer_frames == [frame]
+
+
+def test_face_detector_crops_before_emotion_inference() -> None:
+    """Configured face detection prevents full-frame classification and is closed."""
+    full_frame, face = object(), object()
+    detector = FakeFaceDetector(face)
+    backend = FakeBackend([classification(3)])
+    pipeline = YoloEmotionPipeline(FakeSource([full_frame]), Path("model.onnx"),
+                                   backend=backend, face_detector=detector,
+                                   sample_interval_seconds=0)
+    pipeline.start()
+    assert pipeline.read() is not None
+    assert detector.frames == [full_frame]
+    assert backend.infer_frames == [face]
+    pipeline.close()
+    assert detector.close_calls == 1
 
 
 def test_model_is_not_loaded_before_first_valid_frame() -> None:

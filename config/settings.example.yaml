@@ -18,6 +18,13 @@ vision:
     width: 640
     height: 480
     fps: 15
+  face_detection:
+    enabled: true
+    cascade_path: "data/vision/haarcascade_frontalface_default.xml"
+    scale_factor: 1.1
+    min_neighbors: 5
+    min_width: 64
+    min_height: 64
   mock:
     emotion: "neutral"
     confidence: 0.90
