@@ -2,6 +2,37 @@
 
 验证日期：2026-08-18
 
+## 2026-08-19 实机与远程验收记录
+
+### 远程连接与同步
+
+- 通过 Tailscale 访问上海树莓派 `chicken-beauty`，地址为 `100.126.205.69`；SSH 服务和 Tailscale 服务均正常。
+- 远端项目目录：`/home/dengjingwen/chicken-beautiful`。
+- GitHub 提交 `95092c6` 已推送并在树莓派检出；MCP 本地配置通过 SSH 单独传输，权限为 `0600`，未进入 Git。
+
+### 树莓派环境与硬件
+
+- 系统：Raspberry Pi arm64，Linux `6.18.34+rpt-rpi-v8`，Python `3.13.5`。
+- 用户已加入 `video`、`i2c`、`gpio` 设备组。
+- CSI 摄像头 OV5647 已被 libcamera 识别；`rpicam-still` 成功采集 640x480 JPEG。
+- 项目 `picamera2` 后端成功返回 `ndarray (480, 640, 3)` 帧。
+- I2C 和 GPIO 设备节点存在；当前未检测到声卡、USB 串口或音频输入输出设备。
+- OpenCV/V4L2 直读路径出现 `media pipeline -22`，不适用于当前 CSI 摄像头；运行配置应使用 `picamera2` 后端。
+
+### 情绪模型
+
+- 本地和 Git 历史没有项目自训模型；从公开 [Emotion_onnx 发布页](https://github.com/Shohruh72/Emotion_onnx/releases/tag/v.1.0.0) 下载候选模型并传输到树莓派。
+- 当前树莓派模型 `data/models/emotion.onnx` 可被 OpenCV DNN 加载，输出形状为 `(1, 7)`；SHA-256：`7863032d8c0c0bc259aa0dd7b8ebf6b607af454e7a0ea82be2b37767914ecd0f`。
+- 单帧摄像头推理已得到七类 logits，并经临时 softmax 得到示例预测 `surprised`（约 `0.368`）。
+- 现有 `parse_emotion_output` 只接受归一化分数，尚未对 logits 做 softmax，因此完整 `YoloEmotionPipeline` 尚未形成最终 `EmotionReading`；需在代码中补充后处理并确认标签顺序。
+
+### 当前阻塞与后续
+
+- 树莓派缺少 `pytest`，且远程账户无 sudo 权限，尚未运行全量自动化测试。
+- 尚未检测到麦克风和扬声器，语音输入/输出链路不能验收。
+- 未发现热成像和 CO2 传感器节点，I2C/GPIO 仅完成系统级可见性检查。
+- 下一步：补充 logits softmax 与模型标签映射测试；由管理员安装 `pytest`/音频依赖；接入并校准实际传感器后执行 `self-test` 和稳定性测试。
+
 ## 自动化验证摘要
 
 - 全量自动化快照：`800 passed`（本次记录为 `799 passed + 1 xfail`；审计测试去除该 xfail 后折算为 800）。该数字仅代表此快照运行结果。
