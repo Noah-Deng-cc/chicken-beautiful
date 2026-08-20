@@ -8,6 +8,7 @@ Dependencies: pytest and the Python standard library only; no real hardware/mode
 from __future__ import annotations
 
 import importlib.abc
+import json
 import logging
 from pathlib import Path
 import subprocess
@@ -125,6 +126,16 @@ def test_seven_column_logits_are_softmax_normalized() -> None:
     assert parse_emotion_output([-1.0, -2.0, 0.1, -0.5, 0.4, -0.2, 1.2], 0.4) == (
         Emotion.SURPRISED, pytest.approx(0.4232, rel=1e-3)
     )
+
+
+def test_pi_capture_fixture_maps_to_expected_emotion() -> None:
+    """A captured Pi logits fixture exercises the deployed model data contract."""
+    fixture = Path(__file__).parent / "fixtures" / "emotion_logits.json"
+    data = json.loads(fixture.read_text(encoding="utf-8"))
+    parsed = parse_emotion_output(data["logits"], float(data["minimum_confidence"]))
+    assert parsed is not None
+    assert parsed[0].value == data["expected_label"]
+    assert parsed[1] >= float(data["minimum_confidence"])
 
 
 def test_eleven_and_twelve_column_detection_outputs() -> None:

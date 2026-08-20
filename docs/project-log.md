@@ -24,7 +24,7 @@
 - 本地和 Git 历史没有项目自训模型；从公开 [Emotion_onnx 发布页](https://github.com/Shohruh72/Emotion_onnx/releases/tag/v.1.0.0) 下载候选模型并传输到树莓派。
 - 当前树莓派模型 `data/models/emotion.onnx` 可被 OpenCV DNN 加载，输出形状为 `(1, 7)`；SHA-256：`7863032d8c0c0bc259aa0dd7b8ebf6b607af454e7a0ea82be2b37767914ecd0f`。
 - 单帧摄像头推理已得到七类 logits，并经临时 softmax 得到示例预测 `surprised`（约 `0.368`）。
-- 现有 `parse_emotion_output` 只接受归一化分数，尚未对 logits 做 softmax，因此完整 `YoloEmotionPipeline` 尚未形成最终 `EmotionReading`；需在代码中补充后处理并确认标签顺序。
+- `parse_emotion_output` 已支持七类 logits 的稳定 softmax；当前公开模型的标签顺序仍是部署假设，已在 `data/models/README.md` 中记录并由数据 fixture 回归。
 
 ### 当前阻塞与后续
 
@@ -47,6 +47,7 @@
 - cascade 文件纳入 `data/vision/haarcascade_frontalface_default.xml`；树莓派 OpenCV 不带内置 cascade，因此使用项目资源文件。
 - 树莓派样例验证检测到 `169x169` 人脸区域，并输出 `neutral`（约 `0.889`）；真实摄像头无脸时管道返回空结果，不产生误分类。
 - 配置入口为 `vision.face_detection`，CSI 摄像头使用 `picamera2`；人脸检测默认开启于示例配置。
+- 树莓派此前通过 SCP 直写过代码，已在 GitHub 快进同步后保持 `83b2132`；模型二进制仍按清单单独部署，不进入 Git。
 
 ## 自动化验证摘要
 

@@ -6,7 +6,8 @@
 
 ```mermaid
 flowchart LR
-  Camera[摄像头] --> Vision[视觉管道]
+  Camera[摄像头] --> Face[人脸检测与裁剪]
+  Face --> Vision[七类情绪分类]
   Thermal[热阵列] --> Temp[温度传感器]
   CO2[CO2 传感器] --> Gas[CO2 传感器]
   Mic[麦克风/VAD/ASR] --> Dialogue[对话服务]
@@ -23,6 +24,8 @@ flowchart LR
 ```
 
 `src/domain` 提供不可变读数、对话和快照契约。`StateStore` 原子保存最新快照；`EventBus` 对每个订阅者使用有界队列，慢消费者不会阻塞采集。`FusionService` 输出结构化上下文和本地高温/高 CO2 告警，且不作医学判断。
+
+视觉链路先使用 Haar cascade 选取最大人脸，再将裁剪区域送入七类情绪 ONNX 分类器。没有检测到人脸时返回空读数，避免把背景误判为情绪；分类模型输出 logits 时由运行时执行稳定 softmax。模型标签顺序和校验值见 `data/models/README.md`。
 
 ## 组件替换与生命周期
 
