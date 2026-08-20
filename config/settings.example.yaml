@@ -14,7 +14,7 @@ vision:
   sample_interval_seconds: 0.20
   camera:
     source: 0
-    backend: "opencv"  # opencv | picamera2 (recommended for CSI cameras)
+    backend: "picamera2"  # picamera2 for CSI cameras; opencv for USB cameras
     width: 640
     height: 480
     fps: 15
