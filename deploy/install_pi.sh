@@ -27,9 +27,22 @@ has_camera() { test -e /dev/video0 || command -v rpicam-hello >/dev/null 2>&1 ||
 has_i2c() { compgen -G '/dev/i2c-*' >/dev/null; }
 has_uart() { test -e /dev/serial0 || compgen -G '/dev/ttyAMA*' >/dev/null || compgen -G '/dev/ttyS*' >/dev/null; }
 has_audio() { command -v aplay >/dev/null 2>&1 && aplay -l >/dev/null 2>&1; }
-has_memory() { test "$(awk '/MemTotal/ { print int($2 / 1024) }' /proc/meminfo)" -ge 450; }
+has_memory() {
+  local memory_mb
+  memory_mb="$(awk '/MemTotal/ { print int($2 / 1024) }' /proc/meminfo)"
+  test "$memory_mb" -ge 450 || {
+    # Zero 2 W firmware reserves enough RAM that Debian reports about 415 MB.
+    test "$memory_mb" -ge 400 && test -r /proc/device-tree/model && grep -qai 'Raspberry Pi Zero 2 W' /proc/device-tree/model
+  }
+}
 has_python() { python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 10))'; }
-has_pios() { test -r /etc/os-release && grep -qi 'raspbian\|raspberry pi' /etc/os-release; }
+has_pios() {
+  test -r /etc/os-release && {
+    grep -qi 'raspbian\|raspberry pi' /etc/os-release || {
+      test -r /proc/device-tree/model && grep -qai 'Raspberry Pi' /proc/device-tree/model
+    }
+  }
+}
 
 while test "$#" -gt 0; do
   case "$1" in
