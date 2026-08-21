@@ -1,0 +1,116 @@
+# Raspberry Pi hardware profile. Copy to config/settings.pi.yaml and adjust device names.
+runtime:
+  mode: "pi"
+  timezone: "Asia/Shanghai"
+  shutdown_timeout_seconds: 10.0
+
+vision:
+  enabled: true
+  driver: "yolo"
+  model_path: "data/models/emotion.onnx"
+  model_format: "onnx"
+  device: "cpu"
+  confidence_threshold: 0.50
+  sample_interval_seconds: 0.20
+  camera:
+    source: 0
+    backend: "picamera2"
+    width: 640
+    height: 480
+    fps: 15
+  face_detection:
+    enabled: true
+    cascade_path: "data/vision/haarcascade_frontalface_default.xml"
+    scale_factor: 1.1
+    min_neighbors: 5
+    min_width: 64
+    min_height: 64
+  mock:
+    emotion: "neutral"
+    confidence: 0.90
+
+thermal:
+  enabled: false
+  driver: "mock"
+  sample_interval_seconds: 2.0
+  min_valid_celsius: 20.0
+  max_valid_celsius: 45.0
+  calibration:
+    emissivity: 0.95
+    offset_celsius: 0.0
+  connection:
+    bus: 1
+    address: "0x33"
+    retries: 3
+  mock:
+    maximum_celsius: 36.7
+    average_celsius: 35.8
+
+co2:
+  enabled: false
+  driver: "mock"
+  sample_interval_seconds: 5.0
+  thresholds_ppm:
+    elevated: 1000
+    poor: 1500
+  connection:
+    port: "<serial-port>"
+    baud_rate: 9600
+    timeout_seconds: 1.0
+    retries: 3
+  mock:
+    ppm: 650
+
+audio:
+  enabled: true
+  input_driver: "vosk"
+  output_driver: "system_tts"
+  language: "zh-CN"
+  listen_timeout_seconds: 8.0
+  input:
+    # PCM2902 USB microphone; use the stable ALSA name rather than an index.
+    device: "USB PnP Sound Device"
+    sample_rate_hz: 44100
+    vosk_model_path: "data/models/vosk-cn"
+  output:
+    # M83 USB speaker; espeak-ng's -d selects this ALSA device.
+    device: "M83"
+    command_argv: ["espeak-ng", "-v", "cmn", "-d", "hw:1,0", "{text}"]
+    # Chinese replies from the Agent can take over 20 seconds on the USB speaker.
+    timeout_seconds: 60.0
+
+agent:
+  enabled: true
+  driver: "tongji_mcp"
+  base_url: "https://agent.tongji.edu.cn/api/proxy/mcp"
+  endpoint: "/"
+  api_key_env: "TONGJI_MCP_API_KEY"
+  agent_id_env: "TONGJI_MCP_AGENT_ID"
+  connect_timeout_seconds: 10.0
+  read_timeout_seconds: 30.0
+  max_retries: 2
+  backoff_seconds: 1.0
+  stream: false
+
+schedule:
+  enabled: true
+  store_path: "data/schedule/reminders.json"
+  poll_interval_seconds: 1.0
+  default_timezone: "Asia/Shanghai"
+
+storage:
+  directory: "data/runtime"
+  jsonl_enabled: true
+  rotate_daily: true
+  persist_dialogue_text: false
+  persist_raw_audio: false
+  persist_raw_images: false
+
+logging:
+  level: "INFO"
+  console_enabled: true
+  file_enabled: true
+  directory: "logs"
+  filename: "dorm-assistant.log"
+  max_bytes: 5242880
+  backup_count: 3
